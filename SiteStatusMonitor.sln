@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteStatusMonitor.Tests", "SiteStatusMonitor.Tests\SiteStatusMonitor.Tests.csproj", "{0FEE8B6E-C0E8-44D9-A94A-ADF069EE2BBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteStatusChecker", "SiteStatusChecker\SiteStatusChecker.csproj", "{44E9A425-6C44-4845-B996-85BAB2B0BDBE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0FEE8B6E-C0E8-44D9-A94A-ADF069EE2BBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FEE8B6E-C0E8-44D9-A94A-ADF069EE2BBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FEE8B6E-C0E8-44D9-A94A-ADF069EE2BBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FEE8B6E-C0E8-44D9-A94A-ADF069EE2BBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44E9A425-6C44-4845-B996-85BAB2B0BDBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44E9A425-6C44-4845-B996-85BAB2B0BDBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44E9A425-6C44-4845-B996-85BAB2B0BDBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44E9A425-6C44-4845-B996-85BAB2B0BDBE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {140B7307-E79E-4389-8574-33BE67A608A3}
+	EndGlobalSection
+EndGlobal
