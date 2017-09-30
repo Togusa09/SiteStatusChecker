@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainAssert.cs" />
     <Compile Include="SiteChecker.cs" />
     <Compile Include="DomainTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

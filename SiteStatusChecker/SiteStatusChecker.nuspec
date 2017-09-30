@@ -1,15 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
-        <!-- Required elements-->
         <id>SiteStatusChecker</id>
         <version>$version$</version>
         <description>Methods for running status checks on a remote web server</description>
         <authors>Ben Hockley(@Togusa09)</authors>
         <projectUrl>https://github.com/Togusa09/SiteStatusChecker</projectUrl>
-
-        <!-- Optional elements -->
-        <!-- ... -->
+        <licenseUrl>https://github.com/Togusa09/SiteStatusChecker/blob/master/LICENSE</licenseUrl>
+        <language>en-US</language>
+        <title>Site Status Checker</title>
+        <copyright>Copyright © Ben Hockley 2017</copyright>
+        <tags>testing</tags>
     </metadata>
     <!-- Optional 'files' node -->
 </package>
