@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <!-- Required elements-->
+        <id>SiteStatusChecker</id>
+        <version>$version$</version>
+        <description>Methods for running status checks on a remote web server</description>
+        <authors></authors>
+        <projectUrl>https://github.com/Togusa09/SiteStatusChecker</projectUrl>
+
+        <!-- Optional elements -->
+        <!-- ... -->
+    </metadata>
+    <!-- Optional 'files' node -->
+</package>
