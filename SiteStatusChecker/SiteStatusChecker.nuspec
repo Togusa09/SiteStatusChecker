@@ -5,7 +5,7 @@
         <id>SiteStatusChecker</id>
         <version>$version$</version>
         <description>Methods for running status checks on a remote web server</description>
-        <authors></authors>
+        <authors>Ben Hockley(@Togusa09)</authors>
         <projectUrl>https://github.com/Togusa09/SiteStatusChecker</projectUrl>
 
         <!-- Optional elements -->
