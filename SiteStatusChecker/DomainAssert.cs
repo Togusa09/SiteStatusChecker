@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography.X509Certificates;
-using FluentAssertions;
 
 namespace SiteStatusChecker
 {
+    
+
     public class DomainAssert
     {
         protected string _domain;
@@ -16,28 +18,48 @@ namespace SiteStatusChecker
         private Dictionary<string, HttpWebResponse> _protocolResponses = new Dictionary<string, HttpWebResponse>();
         private Dictionary<string, HttpWebRequest> _protocolRequests = new Dictionary<string, HttpWebRequest>();
 
+        private Action<string> _failureAssertion;
+
+        public DomainAssert(Action<string> failureAssertion)
+        {
+            _failureAssertion = failureAssertion;
+        }
 
         public DomainAssert AssertIsOnline()
         {
             var pingSender = new Ping();
             var reply = pingSender.Send(_domain);
 
-            reply.Should().NotBeNull();
-            reply.Status.Should().Be(IPStatus.Success, $"Because server for domain {_domain} is not online");
+            if (reply == null)
+            {
+                _failureAssertion("Server reply should not be null");
+            }
+
+            if (reply.Status != IPStatus.Success)
+            {
+                _failureAssertion($"Because server for domain {_domain} is not online");
+            }
+
             return this;
         }
 
         public DomainAssert AssertThatResolvesDns()
         {
             var entries = Dns.GetHostAddresses(_domain);
-            entries.Should().NotBeNullOrEmpty($"Because unable to resolve dns entry for {_domain}");
+
+            if (!entries.Any())
+                _failureAssertion($"Because unable to resolve dns entry for {_domain}");
+
             return this;
         }
 
         public DomainAssert AssertThatCantResolvesDns()
         {
             var entries = Dns.GetHostAddresses(_domain);
-            entries.Should().BeNullOrEmpty($"Because to resolved dns entry for {_domain}");
+            //entries.Should().BeNullOrEmpty($"Because to resolved dns entry for {_domain}");
+            if (entries.Any())
+                _failureAssertion($"Because resolved dns entry for {_domain}");
+
             return this;
         }
 
@@ -49,12 +71,16 @@ namespace SiteStatusChecker
                 var responseHost = response.ResponseUri.Host;
                 if (!string.IsNullOrWhiteSpace(redirectDomain))
                 {
-                    responseHost.Should().Be(redirectDomain, "because domain was not redirected");
+                    if (responseHost != redirectDomain)
+                        _failureAssertion("Because domain was not redirected");
                 }
 
                 if (!string.IsNullOrWhiteSpace(redirectProtocol))
                 {
-                    response.ResponseUri.Scheme.Should().Be(redirectProtocol, "Because protocol was not redirected");
+                    if (response.ResponseUri.Scheme != redirectProtocol)
+                    {
+                        _failureAssertion("Because protocol was not redirected");
+                    }
                 }
             }
 
@@ -66,7 +92,10 @@ namespace SiteStatusChecker
             {
                 var response = GetOrCreateResponse(protocol);
                
-                response.StatusCode.Should().Be(HttpStatusCode.OK, "because was unable to successfully retrieve content");
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    _failureAssertion("Because was unable to successfully retrieve content");
+                }
             }
 
             return this;
@@ -105,7 +134,10 @@ namespace SiteStatusChecker
             {
                 var request = GetOrCreateRequest(protocol);
                 var cert = request.ServicePoint.Certificate;
-                cert.Should().NotBeNull("because site does not have a certificate");
+                if (cert == null)
+                {
+                    _failureAssertion("Because site does not have a certificate");
+                }
 
                 var cert2 = new X509Certificate2(cert);
 
@@ -114,7 +146,11 @@ namespace SiteStatusChecker
                 var cpub = cert2.GetPublicKeyString();
 
                 var certExpiryDate = DateTime.Parse(cedate);
-                certExpiryDate.Should().BeAfter(DateTime.Now.Add(fromDays), "because certificate expires within specified timeframe");
+                //certExpiryDate.Should().BeAfter(DateTime.Now.Add(fromDays), "because certificate expires within specified timeframe");
+                if (certExpiryDate < DateTime.Today.Add(fromDays))
+                {
+                    _failureAssertion("Because certificate expires within specified timeframe");
+                }
 
             }
 

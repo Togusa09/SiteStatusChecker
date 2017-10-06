@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>SiteStatusChecker</id>
-        <version>$version$</version>
+        <version>1.1</version>
         <description>Methods for running status checks on a remote web server</description>
         <authors>Ben Hockley(@Togusa09)</authors>
         <projectUrl>https://github.com/Togusa09/SiteStatusChecker</projectUrl>

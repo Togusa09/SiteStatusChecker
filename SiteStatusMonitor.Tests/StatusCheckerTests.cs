@@ -1,11 +1,19 @@
 ﻿using System;
 using SiteStatusChecker;
 using Xunit;
+using FluentAssertions;
+using FluentAssertions.Execution;
+using Xunit.Sdk;
 
 namespace SiteStatusMonitor
 {
     public class StatusCheckerTests
     {
+        public StatusCheckerTests()
+        {
+            SiteChecker.SetFailureAssertion(message => Execute.Assertion.FailWith(message));
+        }
+
         [Theory]
         [InlineData("google.com.au", "http")]
         [InlineData("google.com.au", "https")]
