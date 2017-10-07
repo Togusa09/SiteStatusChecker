@@ -8,11 +8,20 @@ Currently the library users the Fluent Assertions library for its assertions, so
 
 ## Setup 
 
+
+```csharp
+// Setup for fluent assertions
+SiteChecker.SetFailureAssertion(message => Execute.Assertion.FailWith(message));
+
+// Setup for NUnit
+SiteChecker.SetFailureAssertion(Assert.Fail);
+```
+
 Sets up test, asserts that the site is accessible
 ```csharp
-SiteChecker.ForDomain("google.com")
-                .WithProtocol("http")
-                .AssertIsAccessible();
+SiteChecker.ForDomain("google.com") // Set domain
+                .WithProtocol("http") // Set protocol
+                .AssertIsAccessible(); // Assert is accessible
 ```
 
 # Assert methods
@@ -29,6 +38,6 @@ Asserts that the server is reachable and returns a HTTP 200 response when querie
 ## AssertRedirectsTo
 Takes a domain and protocol as parameters. Asserts that requests to the domain are redirected to the supplied domain and protocol.
 
-# AssertCertIsValidFor
+## AssertCertIsValidFor
 Takes a timespan as parameter. Asserts that the certificate will not expire within the specified timespan.
 
