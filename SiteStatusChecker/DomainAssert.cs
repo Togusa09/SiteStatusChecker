@@ -7,14 +7,11 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace SiteStatusChecker
 {
-    
-
     public class DomainAssert
     {
-        protected string _domain;
-        protected readonly List<string> _protocols = new List<string>();
-        private string _redirectDomain;
-        private string _redirectionProtocol;
+        protected string Domain;
+        protected readonly List<string> Protocols = new List<string>();
+
         private Dictionary<string, HttpWebResponse> _protocolResponses = new Dictionary<string, HttpWebResponse>();
         private Dictionary<string, HttpWebRequest> _protocolRequests = new Dictionary<string, HttpWebRequest>();
 
@@ -28,7 +25,7 @@ namespace SiteStatusChecker
         public DomainAssert AssertIsOnline()
         {
             var pingSender = new Ping();
-            var reply = pingSender.Send(_domain);
+            var reply = pingSender.Send(Domain);
 
             if (reply == null)
             {
@@ -37,7 +34,7 @@ namespace SiteStatusChecker
 
             if (reply.Status != IPStatus.Success)
             {
-                _failureAssertion($"Because server for domain {_domain} is not online");
+                _failureAssertion($"Because server for domain {Domain} is not online");
             }
 
             return this;
@@ -45,27 +42,26 @@ namespace SiteStatusChecker
 
         public DomainAssert AssertThatResolvesDns()
         {
-            var entries = Dns.GetHostAddresses(_domain);
+            var entries = Dns.GetHostAddresses(Domain);
 
             if (!entries.Any())
-                _failureAssertion($"Because unable to resolve dns entry for {_domain}");
+                _failureAssertion($"Because unable to resolve dns entry for {Domain}");
 
             return this;
         }
 
         public DomainAssert AssertThatCantResolvesDns()
         {
-            var entries = Dns.GetHostAddresses(_domain);
-            //entries.Should().BeNullOrEmpty($"Because to resolved dns entry for {_domain}");
+            var entries = Dns.GetHostAddresses(Domain);
             if (entries.Any())
-                _failureAssertion($"Because resolved dns entry for {_domain}");
+                _failureAssertion($"Because resolved dns entry for {Domain}");
 
             return this;
         }
 
         public DomainAssert AssertRedirectsTo(string redirectDomain, string redirectProtocol)
         {
-            foreach (var protocol in _protocols)
+            foreach (var protocol in Protocols)
             {
                 var response = GetOrCreateResponse(protocol);
                 var responseHost = response.ResponseUri.Host;
@@ -88,7 +84,7 @@ namespace SiteStatusChecker
         }
         public DomainAssert AssertIsAccessible()
         {
-            foreach (var protocol in _protocols)
+            foreach (var protocol in Protocols)
             {
                 var response = GetOrCreateResponse(protocol);
                
@@ -101,7 +97,6 @@ namespace SiteStatusChecker
             return this;
         }
 
-
         private HttpWebRequest GetOrCreateRequest(string protocol)
         {
             if (_protocolRequests.ContainsKey(protocol))
@@ -109,7 +104,7 @@ namespace SiteStatusChecker
                 return _protocolRequests[protocol];
             }
 
-            var myUri = new UriBuilder(protocol, _domain);
+            var myUri = new UriBuilder(protocol, Domain);
 
             var request = (HttpWebRequest)WebRequest.Create(myUri.Uri);
             request.UserAgent = "Test User Agent";
@@ -130,7 +125,7 @@ namespace SiteStatusChecker
 
         public DomainAssert AssertCertIsValidFor(TimeSpan fromDays)
         {
-            foreach (var protocol in _protocols)
+            foreach (var protocol in Protocols)
             {
                 var request = GetOrCreateRequest(protocol);
                 var cert = request.ServicePoint.Certificate;
@@ -146,7 +141,6 @@ namespace SiteStatusChecker
                 var cpub = cert2.GetPublicKeyString();
 
                 var certExpiryDate = DateTime.Parse(cedate);
-                //certExpiryDate.Should().BeAfter(DateTime.Now.Add(fromDays), "because certificate expires within specified timeframe");
                 if (certExpiryDate < DateTime.Today.Add(fromDays))
                 {
                     _failureAssertion("Because certificate expires within specified timeframe");

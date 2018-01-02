@@ -1,9 +1,7 @@
 ﻿using System;
 using SiteStatusChecker;
 using Xunit;
-using FluentAssertions;
 using FluentAssertions.Execution;
-using Xunit.Sdk;
 
 namespace SiteStatusMonitor
 {
@@ -29,21 +27,12 @@ namespace SiteStatusMonitor
         }
 
         [Fact]
-        public void TestThatGoogleRedirectsToLocalSite()
-        {
-            SiteChecker.ForDomain("google.com")
-                .WithProtocol("http")
-                // I'm in australia, so google redirects to the au site
-                .AssertRedirectsTo("www.google.com.au", "http");
-        }
-
-        [Fact]
         public void TestThatGoogleHasValidCert()
         {
             SiteChecker.ForDomain("google.com")
                 .WithProtocol("https")
                 // I'm in australia, so google redirects to the au site
-                .AssertRedirectsTo("www.google.com.au", "https")
+                //.AssertRedirectsTo("www.google.com.au", "https")
                 .AssertCertIsValidFor(TimeSpan.FromDays(30));
         }
 

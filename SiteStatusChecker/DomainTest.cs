@@ -7,11 +7,10 @@ namespace SiteStatusChecker
     {
         public DomainTest(string domain, Action<string> failureAssertion) : base(failureAssertion)
         {
-            _domain = domain;
+            Domain = domain;
             ServicePointManager.ServerCertificateValidationCallback = AcceptAllCertifications;
         }
 
-        
         public bool AcceptAllCertifications(object sender,
             System.Security.Cryptography.X509Certificates.X509Certificate certification,
             System.Security.Cryptography.X509Certificates.X509Chain chain,
@@ -22,7 +21,7 @@ namespace SiteStatusChecker
 
         public DomainTest WithProtocol(string protocol)
         {
-            _protocols.Add(protocol);
+            Protocols.Add(protocol);
             return this;
         }
     }
