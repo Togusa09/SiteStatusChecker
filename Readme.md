@@ -4,6 +4,11 @@ This library is designed to provide a simple  way to query the status of a webse
 
 Currently the library users the Fluent Assertions library for its assertions, so it supports all the testing frameworks that it supports
 
+## Installation
+
+Add from nuget, or use the nuget console:
+`Install-Package SiteStatusChecker -Version 1.1.1 `
+
 # Examples
 
 ## Setup 
