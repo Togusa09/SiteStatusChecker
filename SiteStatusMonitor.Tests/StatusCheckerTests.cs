@@ -42,8 +42,7 @@ namespace SiteStatusMonitor
             SiteChecker.ForDomain("anarks2.com")
                 .WithProtocol("http")
                 .AssertRedirectsTo("blog.anarks2.com", "https")
-                .AssertCertIsValidFor(TimeSpan.FromDays(30))
-                .AssertCertCoversAddress("asdsad");
+                .AssertCertIsValidFor(TimeSpan.FromDays(30));
         }
 
         [Fact]

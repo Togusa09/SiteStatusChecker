@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Policy;
 
 namespace SiteStatusChecker
 {
@@ -15,10 +13,10 @@ namespace SiteStatusChecker
         protected string Domain;
         protected readonly List<string> Protocols = new List<string>();
 
-        private Dictionary<string, HttpWebResponse> _protocolResponses = new Dictionary<string, HttpWebResponse>();
-        private Dictionary<string, HttpWebRequest> _protocolRequests = new Dictionary<string, HttpWebRequest>();
+        private readonly Dictionary<string, HttpWebResponse> _protocolResponses = new Dictionary<string, HttpWebResponse>();
+        private readonly Dictionary<string, HttpWebRequest> _protocolRequests = new Dictionary<string, HttpWebRequest>();
 
-        private Action<string> _failureAssertion;
+        private readonly Action<string> _failureAssertion;
 
         public DomainAssert(Action<string> failureAssertion)
         {
@@ -38,7 +36,7 @@ namespace SiteStatusChecker
             
             if (reply.Status != IPStatus.Success)
             {
-                _failureAssertion($"Because server for domain {_domain} is not responding to ping. Returned status " + reply.Status);
+                _failureAssertion($"Because server for domain {Domain} is not responding to ping. Returned status " + reply.Status);
             }
 
             return this;
@@ -46,7 +44,7 @@ namespace SiteStatusChecker
 
         public DomainAssert AssertThatResolvesDns()
         {
-            var hostEntry = Dns.GetHostEntry(_domain);
+            var hostEntry = Dns.GetHostEntry(Domain);
 
             if (!hostEntry.AddressList.Any())
                 _failureAssertion($"Because unable to resolve dns entry for {Domain}");
@@ -56,7 +54,7 @@ namespace SiteStatusChecker
 
         public DomainAssert AssertThatCantResolvesDns()
         {
-            var hostEntry = Dns.GetHostEntry(_domain);
+            var hostEntry = Dns.GetHostEntry(Domain);
 
             if (hostEntry.AddressList.Any())
                 _failureAssertion($"Because resolved dns entry for {Domain}");
@@ -155,7 +153,7 @@ namespace SiteStatusChecker
 
         public DomainAssert AssertCertIsValidFor(TimeSpan fromDays)
         {
-            foreach (var protocol in _protocols)
+            foreach (var protocol in Protocols)
             {
                 var cedate = GetRemoteServerCertificate(protocol).GetExpirationDateString();
 
