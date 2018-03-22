@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Policy;
 
 namespace SiteStatusChecker
 {
@@ -22,7 +25,7 @@ namespace SiteStatusChecker
             _failureAssertion = failureAssertion;
         }
 
-        public DomainAssert AssertIsOnline()
+        public DomainAssert AssertRespondsToPing()
         {
             var pingSender = new Ping();
             var reply = pingSender.Send(Domain);
@@ -30,11 +33,12 @@ namespace SiteStatusChecker
             if (reply == null)
             {
                 _failureAssertion("Server reply should not be null");
+                return this;
             }
-
+            
             if (reply.Status != IPStatus.Success)
             {
-                _failureAssertion($"Because server for domain {Domain} is not online");
+                _failureAssertion($"Because server for domain {_domain} is not responding to ping. Returned status " + reply.Status);
             }
 
             return this;
@@ -42,9 +46,9 @@ namespace SiteStatusChecker
 
         public DomainAssert AssertThatResolvesDns()
         {
-            var entries = Dns.GetHostAddresses(Domain);
+            var hostEntry = Dns.GetHostEntry(_domain);
 
-            if (!entries.Any())
+            if (!hostEntry.AddressList.Any())
                 _failureAssertion($"Because unable to resolve dns entry for {Domain}");
 
             return this;
@@ -52,8 +56,9 @@ namespace SiteStatusChecker
 
         public DomainAssert AssertThatCantResolvesDns()
         {
-            var entries = Dns.GetHostAddresses(Domain);
-            if (entries.Any())
+            var hostEntry = Dns.GetHostEntry(_domain);
+
+            if (hostEntry.AddressList.Any())
                 _failureAssertion($"Because resolved dns entry for {Domain}");
 
             return this;
@@ -90,7 +95,7 @@ namespace SiteStatusChecker
                
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    _failureAssertion("Because was unable to successfully retrieve content");
+                    _failureAssertion("Because was unable to successfully retrieve content. Response code was " + response.StatusCode);
                 }
             }
 
@@ -123,22 +128,36 @@ namespace SiteStatusChecker
             return response;
         }
 
-        public DomainAssert AssertCertIsValidFor(TimeSpan fromDays)
+        public DomainAssert AssertCertCoversAddress(string domain)
         {
             foreach (var protocol in Protocols)
             {
-                var request = GetOrCreateRequest(protocol);
-                var cert = request.ServicePoint.Certificate;
-                if (cert == null)
+                var cert = GetRemoteServerCertificate(protocol);
+
+                var san = new X509Certificate2(cert).Extensions["Subject Alternative Name"];
+                var asndata = new AsnEncodedData(san.Oid, san.RawData);
+                var asn = asndata.Format(false);
+                var addressesList = asn.Replace("DNS Name=", "").Split(',').Select(x => x.Trim()).ToList();
+                
+                var hostName = cert.GetNameInfo(X509NameType.DnsName, false);
+                if (!addressesList.Contains(hostName))
                 {
-                    _failureAssertion("Because site does not have a certificate");
+                    addressesList.Add(hostName);
                 }
 
-                var cert2 = new X509Certificate2(cert);
+                if (!addressesList.Contains(domain))
+                {
+                    _failureAssertion("The domain " + domain + " was not included in the certificates SAN list");
+                }
+            }
+            return this;
+        }
 
-                var cn = cert2.GetIssuerName();
-                var cedate = cert2.GetExpirationDateString();
-                var cpub = cert2.GetPublicKeyString();
+        public DomainAssert AssertCertIsValidFor(TimeSpan fromDays)
+        {
+            foreach (var protocol in _protocols)
+            {
+                var cedate = GetRemoteServerCertificate(protocol).GetExpirationDateString();
 
                 var certExpiryDate = DateTime.Parse(cedate);
                 if (certExpiryDate < DateTime.Today.Add(fromDays))
@@ -149,6 +168,22 @@ namespace SiteStatusChecker
             }
 
             return this;
+        }
+
+        private X509Certificate2 GetRemoteServerCertificate(string protocol)
+        {
+            // Have to make a server request to get the certificates
+            GetOrCreateResponse(protocol);
+            var request = GetOrCreateRequest(protocol);
+            var cert = request.ServicePoint.Certificate;
+            if (cert == null)
+            {
+                _failureAssertion("Because site does not have a certificate");
+            }
+
+            var cert2 = new X509Certificate2(cert);
+
+            return cert2;
         }
     }
 }

@@ -22,7 +22,7 @@ namespace SiteStatusMonitor
             SiteChecker.ForDomain(domain)
                 .WithProtocol(protocol)
                 .AssertThatResolvesDns()
-                .AssertIsOnline()
+                .AssertRespondsToPing()
                 .AssertIsAccessible();
         }
 
@@ -42,8 +42,17 @@ namespace SiteStatusMonitor
             SiteChecker.ForDomain("anarks2.com")
                 .WithProtocol("http")
                 .AssertRedirectsTo("blog.anarks2.com", "https")
-                .AssertCertIsValidFor(TimeSpan.FromDays(30));
+                .AssertCertIsValidFor(TimeSpan.FromDays(30))
+                .AssertCertCoversAddress("asdsad");
+        }
+
+        [Fact]
+        public void TestThatBlogCertCoversBlogAddress()
+        {
+            SiteChecker.ForDomain("anarks2.com")
+                .WithProtocol("https")
+                .AssertCertCoversAddress("anarks2.com")
+                .AssertCertCoversAddress("*.anarks2.com");
         }
     }
-
 }
