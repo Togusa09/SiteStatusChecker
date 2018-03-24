@@ -1,0 +1,38 @@
+version: 1.2.{build}
+skip_tags: true
+skip_branch_with_pr: true
+image: Visual Studio 2017
+branches:
+  only:
+    - master
+skip_commits:
+  files:
+    - Readme.md
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+before_build:
+- cmd: nuget restore
+build:
+  publish_nuget: true
+  verbosity: normal
+test: off
+deploy:
+- provider: NuGet
+  api_key:
+    secure: dsH/QpKmeTU9ZuPY6o914NCAT6PjcExcX6nBFTFon0i5vy0efLbSdn/mO9urtKTa
+  skip_symbols: false
+  artifact: /.*\.nupkg/
+  on:
+    branch: master

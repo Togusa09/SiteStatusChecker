@@ -7,12 +7,13 @@ Currently the library users the Fluent Assertions library for its assertions, so
 ## Installation
 
 Add from nuget, or use the nuget console:
-`Install-Package SiteStatusChecker -Version 1.1.1 `
+`Install-Package SiteStatusChecker`
 
 # Examples
 
 ## Setup 
 
+A failure assertion needs to be supplied for the testing framework that is being used. This needs to be done before calling the assertions, and can be done in a test constructor or test setup method.
 
 ```csharp
 // Setup for fluent assertions
@@ -29,13 +30,14 @@ SiteChecker.ForDomain("google.com") // Set domain
                 .AssertIsAccessible(); // Assert is accessible
 ```
 
-# Assert methods
+# Available Assert methods
 
 ## AssertThatResolvesDNS
 Asserts that it is possible to resolve the DNS entry for the domain.
 
-## AssertThatIsonline
+## AssertRespondsToPing
 Asserts that the server is responding to ping. 
+_Formally AssertThatIsonline, but was renamed as they server may be online, but not responding to ping_
 
 ## AssertThatIsAccessible
 Asserts that the server is reachable and returns a HTTP 200 response when queried with the setup protocol.
@@ -46,3 +48,5 @@ Takes a domain and protocol as parameters. Asserts that requests to the domain a
 ## AssertCertIsValidFor
 Takes a timespan as parameter. Asserts that the certificate will not expire within the specified timespan.
 
+## AssertCertCoversAddress
+Asserts that the certificate returned for the target address covers a specific domain. This will generally be the same as the initially specified domain, but can be used to to check additional domains.
